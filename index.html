@@ -312,7 +312,11 @@ function initCard(card, cv, isPrize) {
     if (gone / (cv.width * cv.height) >= 0.60) {
       card.dataset.done = '1';
       cv.style.display = 'none';
-      if (isPrize && !winFired) { winFired = true; setTimeout(showWin, 400); }
+      if (isPrize && !winFired) {
+        winFired = true;
+        playWinSound(); // direto no evento de toque — exigido pelo mobile
+        setTimeout(showWin, 400);
+      }
     }
   }
 
@@ -339,10 +343,11 @@ function initCard(card, cv, isPrize) {
 }
 
 // SOM
-async function playWinSound() {
+function playWinSound() {
   try {
-    const ac = new (window.AudioContext || window.webkitAudioContext)();
-    await ac.resume();
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    const ac = new AC();
 
     function note(freq, t, dur, type, vol) {
       const o = ac.createOscillator();
@@ -376,7 +381,6 @@ function showWin() {
   document.getElementById('scratchScreen').style.display = 'none';
   document.getElementById('winScreen').classList.add('show');
   window.scrollTo({top:0, behavior:'smooth'});
-  playWinSound();
   boom(); setTimeout(boom,900); setTimeout(boom,1800);
 }
 
